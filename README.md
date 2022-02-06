@@ -20,6 +20,11 @@ Download it from [http://help.sentiment140.com/for-students](http://help.sentime
 Run: scripts at SRC
 
 
+## Data
+
+#### The data used is available at [Google Drive link](https://docs.google.com/file/d/0B04GJPshIjmPRnZManQwWEdTZjg/edit?resourcekey=0-betyQkEmWZgp8z0DFxWsHw).
+
+#### Text annotation is available by using *Linguakit*, to install it follow [this steps](# https://github.com/citiususc/Linguakit).
 
 ## R Libraries
 
