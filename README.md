@@ -22,9 +22,35 @@ Run: scripts at SRC
 
 ## Data
 
-#### The data used is available at [Google Drive link](https://docs.google.com/file/d/0B04GJPshIjmPRnZManQwWEdTZjg/edit?resourcekey=0-betyQkEmWZgp8z0DFxWsHw).
+#### sentim140
 
-#### Text annotation is available by using *Linguakit*, to install it follow [this steps](# https://github.com/citiususc/Linguakit).
+It is available at [Google Drive link](https://docs.google.com/file/d/0B04GJPshIjmPRnZManQwWEdTZjg/edit?resourcekey=0-betyQkEmWZgp8z0DFxWsHw).
+
+#### Text annotation 
+
+It is possible by using *Linguakit*. 
+
+1. Install it following [this steps](# https://github.com/citiususc/Linguakit).
+
+a. git clone  https://github.com/citiususc/Linguakit
+
+b. cd Linguakit
+
+c. sudo make deps
+
+d. sudo make install
+
+e. sudo make test-me
+
+2. Run *03_txtFilesWithTextsForLinguakit.R*
+
+3. Copy *fileToBatch.sh* from *SRC* and paste it into *Linguakit* directory.
+
+4. Open the terminal and go to *Linguakit* directory.
+
+5. Give execute permission to your script: chmod +x fileToBatch.sh
+
+6. Run the script: ./fileToBatch.sh
 
 ## R Libraries
 
