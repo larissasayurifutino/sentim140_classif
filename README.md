@@ -30,7 +30,7 @@ It is available at [Google Drive link](https://docs.google.com/file/d/0B04GJPshI
 
 It is possible by using *Linguakit*. 
 
-1. Install it following [this steps](# https://github.com/citiususc/Linguakit).
+1. Install it following [this steps](https://github.com/citiususc/Linguakit).
 
 a. git clone  https://github.com/citiususc/Linguakit
 
@@ -54,7 +54,13 @@ e. sudo make test-me
 
 ## R Libraries
 
+* doParallel
+
 * dplyr
+
+* future
+
+* future.apply
 
 * slam
 
