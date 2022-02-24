@@ -5,26 +5,6 @@ library(tidytext)
 library(stringr)
 library(slam)
 
-## -- Funcoes ----
-
-# funcao
-funcao <- function(ANOT, ID){
-  print(ID)
-  anotSplit <- strsplit(x = as.character(ANOT), split = " ")
-  anotSplit <- unlist(anotSplit)
-  df <- data.frame(id = ID,
-                   anotSemant = anotSplit)  
-  return(df)
-}
-
-# funcaoPassaArgs
-# Precisa de: funcao
-funcaoPassaArgs <- function(DFARGS, NOMEVARANOT, nameVarId = "id"){
-  colAnot <- which(names(DFARGS) == NOMEVARANOT)
-  colID <- which(names(DFARGS) == nameVarId)
-  DF <- funcao(ANOT = DFARGS[, colAnot], ID = DFARGS[, colID]) 
-  return(DF)
-}
 
 ## -- File ----
 diret <- "DATA"
@@ -35,22 +15,24 @@ dfText <- readRDS(file.path(diret, nameFileLoad))
 
 ## -- Applying function to data ----
 nameVarClassif <- "target" 
-nomeVarText <- "text"
+nameVarText <- "text"
 nameVarId <- "id"
-#peso <- "binary"
 
-# Objeto de Retorno da Funcao
-listaRetorno <- vector(mode = "list", length = 1)
-names(listaRetorno) <- "dfDTMMatClassif"
 
-# O indice das colunas associadas às informacoes que queremos guardar
-colunaVarId <- which(names(dfText) == nameVarId)
-colunaVarClassif <- which(names(dfText) == nameVarClassif)
-colunaVarTexto <- which(names(dfText) == nomeVarText)
+# Column indexes of the variables we are interested
+column_idVar <- which(names(dfText) == nameVarId)
+column_targetVar <- which(names(dfText) == nameVarClassif)
+column_textVar <- which(names(dfText) == nameVarText)
 
-## -- Informacao da classificacao de kd tweet -- ##
-dfClassif <- data.frame(id = as.character(dfText[, colunaVarId]),
-                        Classif = dfText[, colunaVarClassif],
+## -- Remove empty text entries ----
+df <- dfText[, c(column_idVar, column_textVar)]; gc()
+column_idVarDF <- which(names(df) == nameVarId)
+df <- df[-which(df$text == ""),]
+
+
+## -- Tweets classification/target ----
+dfClassif <- data.frame(id = as.character(dfText[, column_idVar]),
+                        Classif = dfText[, column_targetVar],
                         stringsAsFactors = FALSE)
 
 dfClassif$"id" <- as.character(dfClassif$"id")
@@ -58,24 +40,8 @@ dfClassif$"Classif" <- as.factor(dfClassif$"Classif")
 levels(dfClassif$"Classif") <- c("0", "4")
 row.names(dfClassif) <- dfClassif$"id"
 
+save(dfClassif, file = "DATA/fileTargetNoDuplic.RData")
 
-df <- dfText[, c(colunaVarId, colunaVarTexto)]; gc()
-colunaVarIdDF <- which(names(df) == nameVarId)
-
-# Remove empty text entries
-df <- df[-which(df$text == ""),]
-
-#dfSplit <- split(x = df, f = df[, colunaVarIdDF]); gc()
-
-## -- Empilhando ----
-# tStringColunas <- system.time(
-#   anotEmpilSplit <- lapply(X = dfSplit, FUN = funcaoPassaArgs, NOMEVARANOT = nomeVarText, nameVarId = nameVarId)  
-# )
-# tStringColunas
-# 
-# 
-# save(anotEmpilSplit, file = "/home/leste/DBSET/Doutorado/BaseDadosTese/06_AplicacaoSentimento/01_Bases/anotEmpilSplit.RData")
-#rm(dfSplit); 
 
 rm(dfText); gc()
 
@@ -85,18 +51,8 @@ dfEmpil <- df %>%
 )
 names(dfEmpil) <- c("id", "word")
 
-# tEmpilDf <- system.time(
-#   anotEmpilDf <- do.call(rbind, anotEmpilSplit)  
-# )
-# tEmpilDf
-## -- DTM -- ##
-# trainvector <- as.vector(dfText[, colunaVarTexto])
-# names(trainvector) <- dfText[, colunaVarId]
-# 
-# traincorpus <- Corpus(VectorSource(trainvector))
-# traincorpus <- tm_map(traincorpus, stripWhitespace)
 
-
+## -- Frequency objects ----
 
 # To count the number of words occurrence and to filter the words with at least 05 appearances
 freqMatDTM <- dfEmpil %>%
