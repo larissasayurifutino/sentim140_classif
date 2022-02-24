@@ -8,55 +8,62 @@ library(doParallel)
 options(scipen = 999)
 
 
-## ------------- ##
-## -- Funções -- ##
-## ------------- ##
+path <- "/home/larissa/Documents/repos/sentim140_classif/DATA/FilesLinguakitSentiment140/02_AlreadyAnnot/"
 
 
-readAlrAnnotated <- function(arquivo, 
-                             caractComID = nchar("/home/larissa/ArqsLinguakitSentiment140/02_JaAnotados/jaAnotArqID")){
-  id <- substr(arquivo, caractComID + 1, nchar(arquivo) - 4)
+## --------------- ##
+## -- Functions -- ##
+## --------------- ##
+readAlrAnnotated <- function(file, 
+                             charactWithID = nchar(path)){
+  id <- substr(file, charactWithID + 2, nchar(file) - 4)
   
-  t1 <- Sys.time()
-  arqLido <- try(read.table(arquivo, header = FALSE, 
+
+  readFile <- try(read.table(file, header = FALSE, 
                             sep = "", stringsAsFactors = FALSE,
                             quote = "&&"),
                  silent = TRUE) 
-  t2 <- Sys.time() 
+
   
-  if("try-error" %in% class(arqLido)){
-    message(paste('Erro no id:', id))
-    #message("Mensagem de erro original:")
-    #message(e)
-    
-    arqFinal <- 999999
-    names(arqFinal) <- id
+  if("try-error" %in% class(readFile)){
+    message(paste('Error at id:', id))
+
+    finalFile <- 999999
+    names(finalFile) <- id
   }else{
-    arqFinal <- paste0(arqLido$V3[-length(arqLido$V3)], collapse = "")
-    names(arqFinal) <- id
+    finalFile <- paste0(readFile$'V3'[-length(readFile$'V3')], collapse = "")
+    names(finalFile) <- id
   }
   
-  return(arqFinal)
+  return(finalFile)
   
-}  
-## ------------------------------ ##
-## -- Quais arquivos vamos ler -- ##
-## ------------------------------ ##
-cam <- "/home/larissa/Documents/repos/sentim140_classif/DATA/FilesLinguakitSentiment140/02_AlreadyAnnot/"
-todosOsArqsAnotados <- system("ls /home/larissa/Documents/repos/sentim140_classif/DATA/FilesLinguakitSentiment140/02_AlreadyAnnot/", intern = TRUE)
+}
+
+## -------------------------------------- ##
+## -- Which files we are going to read -- ##
+## -------------------------------------- ##
+
+# To list all files of a directory faster
+allAnnotatedFiles <- system("ls /home/larissa/Documents/repos/sentim140_classif/DATA/FilesLinguakitSentiment140/02_AlreadyAnnot/", intern = TRUE)
+
+# To test (with a single file):
+first_file <- readAlrAnnotated(file = file.path(path, allAnnotatedFiles[1]), 
+                 charactWithID = nchar(path))
 
 
+# All files:
+## To run in parallel on local computer
 cl <- makeCluster(2)
 registerDoParallel(cores = 2)
-plan(multiprocess) ## Run in parallel on local computer
+plan(multisession) 
 
 
 
-tCom <- Sys.time(); tCom
-lista <- future_lapply(X = file.path(cam, todosOsArqsAnotados), FUN = readAlrAnnotated)
-tFim <- Sys.time(); tFim
+tBeg <- Sys.time(); tBeg
+listSeqAnnotFiles <- future_lapply(X = file.path(path, allAnnotatedFiles), FUN = readAlrAnnotated)
+tEnd <- Sys.time(); tEnd
 
-caminhoSalvarRData <- "/home/larissa/DBSET/Doutorado/BaseDadosTese/06_AplicacaoSentimento/01_Bases/LendoCodsAnotados"
+fileSaveRData <- "/home/larissa/Documents/repos/sentim140_classif/DATA"
 
-save(lista,
-     file = paste(caminhoSalvarRData, "listaSeqArqsAnotados.RData", sep = "/"))
+save(listSeqAnnotFiles,
+     file = paste(fileSaveRData, "listSeqAnnotFiles.RData", sep = "/"))
