@@ -1,3 +1,6 @@
+## -- This script reads the file and saves terms frequencies and DTM matrix
+
+# 02
 rm(list = ls()); gc()
 library(tm)
 library(dplyr)
@@ -27,7 +30,6 @@ column_textVar <- which(names(dfText) == nameVarText)
 ## -- Remove empty text entries ----
 df <- dfText[, c(column_idVar, column_textVar)]; gc()
 column_idVarDF <- which(names(df) == nameVarId)
-df <- df[-which(df$text == ""),]
 
 
 ## -- Tweets classification/target ----
@@ -70,7 +72,7 @@ freqMatDTMAux <- dfEmpil %>%
 
 
 # To keep only the words that are at freqMatDTM
-freqMatDTMAuxPalComFreqMin <-freqMatDTMAux %>%
+freqMatDTMAuxPalComFreqMin <- freqMatDTMAux %>%
   filter(word %in% freqMatDTM$"word")
 
 freqMatDTMAuxPalComFreqMin$"n" <- 1
@@ -87,3 +89,11 @@ matDTMCast <- cast_dtm(data = freqMatDTMAuxPalComFreqMin,
                        weighting = function(x) weightSMART(x, spec = "bnn"))
 
 save(matDTMCast, file = "DATA/matDTMCast.RData")
+
+
+## Long format object
+df <- merge(freqMatDTMAuxPalComFreqMin, dfClassif, by = "id")
+names(df) <- c("document", "term", "count", "target")
+save(df, file = "DATA/df.RData")
+
+
